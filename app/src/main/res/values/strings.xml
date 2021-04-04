@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Connect</string>
+    <string name="buyer">buyer</string>
+    <string name="seller">seller</string>
+</resources>

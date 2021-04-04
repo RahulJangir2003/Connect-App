@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.connect">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".Cart"
+            android:label="Cart">
+        </activity>
+        <activity android:name=".OrdersActivity"
+            android:label="Orders"></activity>
+        <activity android:name=".BuyerShopItemActivity"
+            android:label="Products"
+            ></activity>
+        <activity android:name=".AddItemActivity" >
+        </activity>
+        <activity android:name=".ShopItemsActivity"
+            ></activity>
+        <activity android:name=".BuyerActivity"
+            android:label="Shops"></activity>
+        <activity android:name=".CreateShop" />
+        <activity android:name=".shopActivity" />
+        <activity android:name=".chooseForOreder"
+            android:label="Shops"></activity>
+        <activity android:name=".choose"></activity>
+        <activity android:name=".SignInActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".Notification.FirebaseService"
+            android:enabled="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
+    </application>
+
+</manifest>
