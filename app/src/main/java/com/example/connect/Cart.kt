@@ -7,6 +7,10 @@ import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.android.volley.AuthFailureError
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
 import com.example.connect.Daos.CartDao
 import com.example.connect.Daos.ShopDao
 import com.example.connect.Models.Cart
@@ -14,6 +18,7 @@ import com.example.connect.Models.CartItem
 import com.example.connect.Models.Order
 import com.example.connect.Models.Shop
 import com.example.connect.Models.item
+import com.example.connect.Notification.MySingletonClass
 import com.example.socialapp.daos.UserDao
 import com.example.socialapp.models.User
 import com.google.firebase.database.*
@@ -93,25 +98,13 @@ class Cart : AppCompatActivity(),IcartItemClicked {
                 }
                 Toast.makeText(this, "Ordered successfully ", Toast.LENGTH_SHORT).show()
                 mAlertDialog.dismiss()
-                val ref: DatabaseReference =
-                    FirebaseDatabase.getInstance().reference.child(cartItem.orderTo)
-                        .child("notificationKey");
-                ref.addValueEventListener(
-                    object : ValueEventListener {
-                        override fun onCancelled(error: DatabaseError) {
-                            Log.d("DataBaseError", error.toString())
-                        }
-
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            sendNotification(
-                                "ORDER : ",
-                                "Hey you get a order for $nameOfOrder",
-                                snapshot.value.toString()
-                            )
-                        }
-
+                GlobalScope.launch {
+                    val shopDao:ShopDao = ShopDao()
+                    val shop = shopDao.getShopById(cartItem.orderTo).await().toObject(Shop::class.java)
+                    if (shop != null) {
+                        sendNotification("ORDER : ","Hey you get a order for $nameOfOrder",shop.userId)
                     }
-                )
+                }
             }
         }
         mAlertDialog.remove.setOnClickListener {
@@ -124,19 +117,49 @@ class Cart : AppCompatActivity(),IcartItemClicked {
             mAlertDialog.dismiss()
         }
     }
-    private fun sendNotification(massage:String, heading:String ,notificationKey:String ){
-        Log.d("notificationKeyShow",notificationKey)
+    private fun sendNotification(
+        heading: String,
+        massage: String,
+        userId: String
+    ){
+        val json = JSONObject()
         try {
-            val notificationContent = JSONObject(
-                "{'contents':{'en':'" + massage + "'},"+
-                        "'include_player_ids':['" + notificationKey + "']," +
-                        "'headings':{'en': '" + heading + "'}}")
-            Log.d("jsonError","no error")
-            OneSignal.postNotification(notificationContent,null)
-
-        }catch (e: JSONException){
-            Log.d("jsonError","$e")
-            print("error ocuurrerd $e")
+            json.put("to", "/topics/$userId")
+            val notificationObj = JSONObject()
+            notificationObj.put("title", heading)
+            notificationObj.put("body", massage)
+            json.put("notification", notificationObj)
+            val url = "https://fcm.googleapis.com/fcm/send"
+            val accessTokenRequest: JsonObjectRequest = object : JsonObjectRequest(
+                Request.Method.POST, url, json,
+                Response.Listener<JSONObject?> { response ->
+                    Log.d("noty", "in sccesfull send the noty")
+                }, Response.ErrorListener {
+                    Log.d("noty", "error $it")
+                }) {
+                @Throws(AuthFailureError::class)
+                override fun getHeaders(): Map<String?, String?> {
+                    val header: HashMap<String?, String> = HashMap()
+                    header["content-type"] = "application/json"
+                    header["authorization"] =
+                        "key=AAAAlk9ER2I:APA91bHm4C7bMWY9eiXS6xCUFCSwNPwSaB9BBeuIwn0PoWoNuCTzZTB5jABAK9P15fn8B4zgHruDiIr0kkGpyxGy2IA8iO7_-w4uWj7h4JmtEudTa3q95OEsEVAnSGpBr2ae3PE9cvqZ"
+                    return header
+                }
+            }
+            MySingletonClass.getInstance(this).addToRequestQueue(accessTokenRequest)
+        } catch (e: JSONException) {
+            e.printStackTrace()
         }
+//        {
+//            "To": "topics/topic name",
+//            notification : {
+//            title : "",
+//            body : ""
+//        },
+//          data : {
+//      brandId : "puma",
+//      cat : "shoes"
+//     }
+//        }
     }
 }

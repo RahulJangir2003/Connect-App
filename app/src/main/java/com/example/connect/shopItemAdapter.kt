@@ -25,7 +25,6 @@ class shopItemAdapter(val listner: IshopItemClicked,val isBuyer:Boolean) : Recyc
 
       view.setOnClickListener {
           listner.OnitemClicked(itemList[viewHolder.adapterPosition])
-
       }
         if(isBuyer)
             viewHolder.cartButton.visibility = View.VISIBLE

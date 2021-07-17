@@ -29,7 +29,7 @@
         <activity android:name=".CreateShop" />
         <activity android:name=".shopActivity" />
         <activity android:name=".chooseForOreder"
-            android:label="Shops"></activity>
+            android:label="Shop Orders"></activity>
         <activity android:name=".choose"></activity>
         <activity android:name=".SignInActivity">
             <intent-filter>

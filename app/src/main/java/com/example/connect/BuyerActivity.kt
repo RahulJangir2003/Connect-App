@@ -21,6 +21,7 @@ import com.example.socialapp.models.User
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.firestore.Query
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.android.synthetic.main.activity_buyer.*
 import kotlinx.android.synthetic.main.item_shop.*
 import kotlinx.android.synthetic.main.nav_header.view.*
@@ -42,6 +43,7 @@ class BuyerActivity : AppCompatActivity(), IshopAdapter {
         setContentView(R.layout.activity_buyer)
         setUpRecyclerView()
         uid = intent.getStringExtra("uid").toString()
+        FirebaseMessaging.getInstance().subscribeToTopic(uid);
         drawerLayout = findViewById(R.id.drawerLayout)
         actionBarToggle = ActionBarDrawerToggle(this, drawerLayout, 0, 0)
         drawerLayout.addDrawerListener(actionBarToggle)
